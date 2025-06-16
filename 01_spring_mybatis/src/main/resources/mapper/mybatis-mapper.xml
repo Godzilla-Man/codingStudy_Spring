@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="kr.or.iei.mybatis.model.dao.MybatisDao">
+<!-- namespace : DAO 파일 경로를 작성하여 연결 처리 -->	
+<!-- 
+id : mapper에서 SQL을 구분하는 값(DAO 메소드 명칭과 동일하게 작성)
+parameterType : 현재 SQL 호출하면서 DAO에서 전달해준 데이터 자료형	
+resultType : SQL 수행 결과 반환 자료형
+
+insert, update, delete는 행의 갯수를 반환하므로 resultType 생략 가능
+ -->
+ 
+	<!-- 
+	if 테스트.
+	화면에서 체크한 컬럼만 조회.
+	대상 회원은 전체 회원이므로 조건식 작성은 X
+	-->
+	<select id="selectIfTest" parameterType="kr.or.iei.mybatis.model.dto.MybatisMember"
+							  resultType="kr.or.iei.mybatis.model.dto.MybatisMember">
+    
+    select <if test="sFlag1 != null and sFlag1 == 'on'">
+ 		   member_no as memberNo,   	
+    	   </if>
+    	   <if test="sFlag2 != null and sFlag2 == 'on'">
+ 		   member_id as memberId,   	
+    	   </if>
+    	   <if test="sFlag3 != null and sFlag3 == 'on'">
+ 		   member_name as memberName,   	
+    	   </if>
+    	   <if test="sFlag4 != null and sFlag4 == 'on'">
+ 		   member_email as memberEmail,   	
+    	   </if>
+    	   <if test="sFlag5 != null and sFlag5 == 'on'">
+ 		   member_phone as memberPhone,   	
+    	   </if>
+    	   'a'
+      from tbl_member
+	</select>
+	
+	<!-- 
+	forEach 테스트를 위한 전체 회원 조회
+	 -->
+    <select id="selectAllMemberList" resultType="kr.or.iei.mybatis.model.dto.MybatisMember">
+    select member_no as memberNo,
+    	   member_id as memberId
+      from tbl_member
+    </select>
+    
+    <!-- 
+    forEach 테스트
+    화면에서 체크한 회원만 조회.
+    
+    collection : 전달된 파라미터 자료형 별칭(배열에는 array)
+    item : foreach 내부에서 요소 바인딩 시, 사용할 임의의 명칭
+    open : 첫 요소 삽입 이전에, 삽입할 값
+    separator : 각 요소들을 구분할 구분자
+    close : 마지막 요소 삽입 이후에, 삽입할 값
+        
+    -->
+  	<select id="selectForTest" parameterType="map" resultType="kr.or.iei.mybatis.model.dto.MybatisMember">
+  	select member_no as memberNo,
+  		   member_id as memberId,
+  		   member_name as memberName,
+  		   member_email as memberEmail,
+  		   member_phone as memberPhone,
+  		   member_addr as memberAddr,
+  		   member_level as memberLevel,
+  		   enroll_date as enrollDate
+      from tbl_member
+     where member_no in
+     <foreach collection="array" 
+     		  item="no" 
+     		  open="("
+     		  separator=","
+     		  close=")">
+   		  #{no}
+     </foreach>
+  	</select>
+  	
+  	<!-- 
+  	choose 테스트
+  	
+  	이름으로 검색 => 포함하는 회원 조회
+  	아이디로 검색 => 일치하는 회원 조회
+  	
+  	아래에, select와 keyword 명칭은 Service 계층에서
+  	HashMap에 put 했을 때, Key 값으로 작성한다.
+  	-->
+  	 <select id="selectChooseTest" parameterType="map" resultType="kr.or.iei.mybatis.model.dto.MybatisMember">
+  	 select member_no as memberNo,
+  		    member_id as memberId,
+  		    member_name as memberName,
+  		    member_email as memberEmail,
+  		    member_phone as memberPhone,
+  		    member_addr as memberAddr,
+  		    member_level as memberLevel,
+  	 	    enroll_date as enrollDate
+       from tbl_member       
+  	 <choose>
+  	 	<when test="select != null and select == 'id'">
+  	  where member_id = #{keyword}  	  		
+  	 	</when>
+  	 	<when test="select != null and select == 'name'">
+  	  where member_name like '%' || #{keyword} || '%'  	
+  	 	</when>
+  	 </choose>
+  	 </select>
+  	 
+  	 <!-- 
+  	 동적 SQL 테스트 - 1  	 
+  	 
+  	 체크한 거주지에 거주하는 회원 정보 조회
+  	 
+  	 아래 IF로 작성한 4개의 조건식은 모두 첫번째 또는 마지막 조건식이 될 수 있음.
+  	 where 태그로 감싸면, 작성되는 조건식 중 첫번째 조건식의 or를 where로 자동 치환해준다.  	 
+  	 
+  	 -->
+  	 <select id="selectDynamicTest1" 
+  	         parameterType="kr.or.iei.mybatis.model.dto.MybatisMember" 
+  	         resultType="kr.or.iei.mybatis.model.dto.MybatisMember">
+ 	 select member_no as memberNo,
+  		    member_id as memberId,
+  		    member_name as memberName,
+  		    member_email as memberEmail,
+  		    member_phone as memberPhone,
+  		    member_addr as memberAddr,
+  		    member_level as memberLevel,
+  	 	    enroll_date as enrollDate
+       from tbl_member
+       <where>
+	       <if test="sFlag1 != null and sFlag1 != ''">
+	       or member_addr like '%' || #{sFlag1} || '%'       
+	       </if>    
+	       <if test="sFlag2 != null and sFlag2 != ''">
+	       or member_addr like '%' || #{sFlag2} || '%'
+	       </if>
+	       <if test="sFlag3 != null and sFlag3 != ''">
+	       or member_addr like '%' || #{sFlag3} || '%'
+	       </if>
+	       <if test="sFlag4 != null and sFlag4 != ''">
+	       or member_addr like '%' || #{sFlag4} || '%'
+	       </if>
+       </where>  	         
+	  </select>
+	  
+	  <!-- 
+	  동적 SQL 테스트 - 2
+	  
+	  등급명 포함 조회 체크박스 체크 시, tbl_level에 level_name 조회
+	  
+	  조건식에 만족할 경우 서브 쿼리 또는 조인 사용하여 조회
+	  
+	  첫번째 방법(select절 안에 삽입)
+	  <if test="sFlag1 != null and sFlag1 != ''">
+  	  	(select level_name from tbl_level where level_code = member_level) as levelName,
+      </if>
+            
+      두번째 방법
+      (현재 기재되어 있음.)
+	  -->  	 
+  	  <select id="selectDynamicTest2" parameterType="string" resultType="kr.or.iei.mybatis.model.dto.MybatisMember">
+  	  select member_no as memberNo,
+  		    member_id as memberId,
+  		    member_name as memberName,
+  		    member_email as memberEmail,
+  		    member_phone as memberPhone,
+  		    member_addr as memberAddr,  		    
+  	 	    enroll_date as enrollDate
+  	 	    <if test="sFlag1 != null and sFlag1 != ''">
+  	 	    , level_name as levelName
+  	 	    </if>
+       from tbl_member
+       <if test="sFlag1 != null and sFlag1 != ''">
+       , tbl_level
+       where member_level = level_code
+       </if>
+  	  </select>
+  	  
+  	  <!-- 
+  	  동적 SQL 테스트 - 3
+  	  
+  	  이름 체크 및 검색어 입력 => 입력한 이름 포함하는 회원 조회 후, 이름 오름차순으로 정렬
+      주소 체크 및 검색어 입력 => 입력한 주소 포함하는 회원 조회 후, 주소 오름차순으로 정렬
+      전화번호 체크 및 검색어 입력 => 입력한 전화번호 포함하는 회원 조회 후, 전화번호 오름차순으로 정렬
+      
+      sFlag1 : member_name 또는 member_addr 또는 member_phone
+      sFlag2 : 사용자 입력값
+      
+      ** 아래 내용은 #표시와 $표시에 따라 값 출력 차이가 있음!!
+      #{sFlag1} => 'member_name'
+      ${sFlag1} => member_name 	  
+  	   -->  	  
+  	  <select id="selectDynamicTest3" parameterType="kr.or.iei.mybatis.model.dto.MybatisMember"
+  	                                  resultType="kr.or.iei.mybatis.model.dto.MybatisMember">  	  
+  	  select member_no as memberNo,
+  		     member_id as memberId,
+  		     member_name as memberName,
+  		     member_email as memberEmail,
+  		     member_phone as memberPhone,
+  		     member_addr as memberAddr,
+  		     member_level as memberLevel,
+  	 	     enroll_date as enrollDate
+        from tbl_member
+      <if test='sFlag2 != null and sFlag2 != ""'>
+      where ${sFlag1} like '%' || #{sFlag2} || '%'
+      </if>
+      order by ${sFlag1}    
+  	  </select>
+  	  
+  	  
+</mapper>

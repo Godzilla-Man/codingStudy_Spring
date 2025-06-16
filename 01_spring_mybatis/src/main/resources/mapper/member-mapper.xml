@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="kr.or.iei.member.model.dao.MemberDao">
+<!-- namespace : DAO 파일 경로를 작성하여 연결 처리 -->
+	
+	<!-- 
+	id : mapper에서 SQL을 구분하는 값(DAO 메소드 명칭과 동일하게 작성)
+	parameterType : 현재 SQL 호출하면서 DAO에서 전달해준 데이터 자료형	
+	resultType : SQL 수행 결과 반환 자료형
+	
+	insert, update, delete는 행의 갯수를 반환하므로 resultType 생략 가능
+	 -->
+	
+	<!--  회원가입 -->
+	<insert id="join" parameterType="kr.or.iei.member.model.dto.Member">
+	insert into tbl_member
+		(
+		member_no,
+		member_id,
+		member_pw,
+		member_name,
+		member_email,
+		member_phone,
+		member_addr,
+		member_level,
+		enroll_date			
+		)
+	values
+		(
+		seq_member.nextval,
+		#{memberId},
+		#{memberPw},
+		#{memberName},
+		#{memberEmail},
+		#{memberPhone},
+		#{memberAddr},			
+		default,
+		sysdate
+		)
+	</insert>  
+	
+	<!--  아이디 중복 체크 -->
+	<select id="idDuplChk" parameterType="string" resultType="_int">
+	select count(*)	from tbl_member	where member_id = #{_parameter}
+	</select>
+	
+	<!-- 로그인 -->
+	<select id="login" parameterType="string" resultType="kr.or.iei.member.model.dto.Member">
+	select member_no as memberNo,
+		   member_id as memberId,
+		   member_pw as memberPw,
+		   member_name as memberName,
+		   member_email as memberEmail,
+		   member_phone as memberPhone,
+		   member_addr as memberAddr,
+		   member_level as memberLevel,
+		   enroll_date as enrollDate
+	  from tbl_member 						
+	 where member_id = #{memberId}
+	
+	</select>
+	
+	<!-- 정보 수정 -->
+	<update id="update" parameterType="kr.or.iei.member.model.dto.Member">
+	update tbl_member
+	   set member_pw = #{memberPw},
+	       member_name = #{memberName},
+	       member_addr = #{memberAddr},
+	       member_phone = #{memberPhone}
+     where member_no = #{memberNo}	
+	</update>
+	
+	<!-- 회원 탈퇴 -->
+	<delete id="delete" parameterType="string">
+	delete from tbl_member
+	 where member_no = #{_parameter}
+	</delete>
+		
+	<!-- 전체 회원 조회 
+		Dao의 selectAllMemberList 메소드 매개변수 없으므로,
+		parameterType은 작성하지 않는다.
+		
+		Dao의 반환 자료형 ArrayList<Member> 임.
+		이때, resultType에는 ArrayList로 관리되는 제네릭 타입인
+		Member 클래스의 경로를 작성한다.
+	-->	
+	<select id="selectAllMemberList" resultType="kr.or.iei.member.model.dto.Member">
+	select member_no as memberNo,
+		   member_id as memberId,
+		   member_name as memberName,
+		   member_email as memberEmail,
+		   member_addr as memberAddr,
+		   member_phone as memberPhone,
+		   member_level as memberLevel,
+		   enroll_date as enrollDate
+	  from tbl_member
+	</select>	
+		
+	<!-- 회원 등급 변경 -->
+	<update id="updateLevel" parameterType="kr.or.iei.member.model.dto.Member">
+	update tbl_member
+	   set member_level = #{memberLevel}
+	 where member_no = #{memberNo}
+	</update>	
+	
+										 	
+</mapper>
+
+
