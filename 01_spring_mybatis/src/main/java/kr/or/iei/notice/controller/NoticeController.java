@@ -61,7 +61,7 @@ public class NoticeController {
 	}
 	
 	@PostMapping("/write")
-	public String wirte(MultipartFile [] files, Notice notice, HttpServletRequest request) {
+	public String write(MultipartFile [] files, Notice notice, HttpServletRequest request) {
 				
 		//서비스에 전달할 파일 객체 리스트
 		ArrayList<NoticeFile> fileList = new ArrayList<NoticeFile>();
