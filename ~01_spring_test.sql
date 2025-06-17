@@ -93,3 +93,8 @@ order by notice_writer
 ) a
 ) a 
 where rnum between 41 and 50;
+
+select * from tbl_notice_file;
+select * from tbl_notice;
+
+delete from tbl_notice_file;

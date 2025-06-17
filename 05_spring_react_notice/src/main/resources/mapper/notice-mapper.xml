@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="kr.or.iei.notice.model.dao.NoticeDao">  
+	
+	<!-- 게시글 목록 조회 -->
+	<select id="selectNoticeList" resultType="Notice"> <!-- 애플리케이션 프로퍼티스에서 'mybatis.type-aliases-package=kr.or.iei.*.model.dto' 별칭 지정으로 인하여 리절트 타입에 간단히 적을 수 있게 됨. -->
+	select notice_no noticeNo,
+		   notice_title noticeTitle,
+		   notice_writer noticeWriter,
+		   to_char(notice_date, 'yyyy-mm-dd') noticeDate
+	  from tbl_notice
+	 order by notice_no desc
+	</select>
+	
+	
+	<!-- 게시글 등록 -->
+	<insert id="insertNotice" parameterType="Notice">
+	insert into tbl_notice values (seq_notice.nextval, #{noticeTitle}, #{noticeContent}, #{noticeWriter}, sysdate)
+	</insert>
+	
+	
+	<!-- 게시글 상세정보 조회 -->
+	<select id="selectOneNotice" parameterType="string" resultType="Notice">
+	select notice_no noticeNo,
+		   notice_title noticeTitle,
+		   notice_content noticeContent,
+		   notice_writer noticeWriter,
+		   to_char(notice_date, 'yyyy-mm-dd') noticeDate
+      from tbl_notice
+     where notice_no = #{_parameter}
+	</select>
+	
+	
+	<!-- 게시글 삭제 -->
+	<delete id="deleteOneNotice"  parameterType="string">
+	delete from tbl_notice where notice_no = #{_parameter}
+	</delete>
+	
+	
+	<!-- 게시글 수정 -->
+	<update id="updateNotice" parameterType="string"> 
+	update tbl_notice
+	   set notice_title = #{noticeTitle},
+	   	   notice_writer = #{noticeWriter},
+	   	   notice_content = #{noticeContent}
+	 where notice_no = #{noticeNo}
+	</update>
+	
+</mapper>
+
+
