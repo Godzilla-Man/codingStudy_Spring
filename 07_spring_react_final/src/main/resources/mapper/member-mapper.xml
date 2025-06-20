@@ -1,4 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="kr.or.iei.member.model.dao.MemberDao">  
+<mapper namespace="kr.or.iei.member.model.dao.MemberDao"> 
+
+	<!-- 아이디 중복 체크 -->
+	<select id="chkMemberId" parameterType="string" resultType="_int">
+	select count(*)
+	  from tbl_member
+	 where member_id = #{_parameter}
+	</select>
+ 	
+ 	
+ 	<!-- 회원 가입 -->
+ 	<insert id="insertMember" parameterType="Member">
+ 	insert into tbl_member
+ 		(
+ 		member_id,
+ 		member_pw,
+ 		member_name,
+ 		member_phone,
+ 		member_level
+ 		)
+ 	values
+ 		(
+ 		#{memberId},
+ 		#{memberPw},
+ 		#{memberName},
+ 		#{memberPhone},
+ 		2 <!-- 회원 레벨 자동 입력 -->
+ 		)	 	
+ 	</insert>
+ 	
+ 	
+ 	<!-- 로그인 -->
+ 	<select id="memberLogin" parameterType="string" resultType="Member">
+ 	select member_id as memberId,
+ 		   member_pw as memberPw,
+ 		   member_level as memberLevel
+ 	  from tbl_member
+ 	 where member_id = #{_parameter} 	  
+ 	</select>
 </mapper>
