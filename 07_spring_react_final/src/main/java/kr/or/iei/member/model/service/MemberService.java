@@ -1,6 +1,7 @@
 package kr.or.iei.member.model.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,6 +64,129 @@ public class MemberService {
 			return null;
 		}		
 	}
+
+	/*
+	public Object selectOneMember(String accessToken, String memberId) {
+		//토큰 검증 결과 획득
+		Object resObj =  jwtUtils.validateToken(accessToken);
+		
+		if(resObj instanceof HttpStatus httpStatus ) {
+			return resObj;
 	
+		}else { //토큰 검증 결과 반환 자료형이 Member일 때 == 토큰이 유효할 때
+			
+			//DB에서 회원 정보 조회하여 리턴
+			Member member = dao.selectOneMember(memberId);
+			member.setMemberPw(null); // 내 정보 컴포넌트에서 비밀번호 불필요하므로, null 처리
+			return member;			
+		}		
+	}
+	*/
+	//AOP 적용 이후
+	public Member selectOneMember(String memberId) {
+			
+		//DB에서 회원 정보 조회하여 리턴
+		Member member = dao.selectOneMember(memberId);
+		member.setMemberPw(null); // 내 정보 컴포넌트에서 비밀번호 불필요하므로, null 처리
+		return member;			
+		
+	}
+	
+
+	//회원 정보 수정
+	/*
+	@Transactional
+	public Object updateMember(String accessToken, Member member) {
+		Object resObj = jwtUtils.validateToken(accessToken);
+		
+		if(resObj instanceof HttpStatus httpStatus) {
+			//resObj가 HttpStatus인 경우 == 토큰 검증 도중 예외가 발생한 경우 == 토큰이 유효하지 않음.
+			return resObj;
+		}else { 
+			//resObj가 Member인 경우 == 토큰이 유효한 경우
+			return dao.updateMember(member);
+		}		
+		
+	}
+	*/
+	
+	//회원 정보 수정
+	//AOP 적용 이후
+	@Transactional
+	public Object updateMember(String accessToken, Member member) {
+		Object resObj = jwtUtils.validateToken(accessToken);
+		
+		if(resObj instanceof HttpStatus httpStatus) {
+			//resObj가 HttpStatus인 경우 == 토큰 검증 도중 예외가 발생한 경우 == 토큰이 유효하지 않음.
+			return resObj;
+		}else { 
+			//resObj가 Member인 경우 == 토큰이 유효한 경우
+			return dao.updateMember(member);
+		}		
+		
+	}
+
+	
+	@Transactional
+	public Object deleteMember(String accessTonken, String memberId) {
+		Object resObj = jwtUtils.validateToken(accessTonken);
+		
+		if(resObj instanceof HttpStatus httpStatus) {
+			return resObj;
+		}else {
+			return dao.deleteMember(memberId);
+		}
+		
+		
+	}
+
+
+	public Object chkMemberPw(String accessToken, Member member) {
+		Object resObj = jwtUtils.validateToken(accessToken);
+		
+		if(resObj instanceof HttpStatus httpStatus) {
+			return resObj;
+		}else {
+			//토큰 검증 성공!
+			
+			//사용자 입력 비밀번호 == 평문, DB의 memberPw는 암호화된 비밀번호 이므로, BCrypt 메소드 사용
+			Member m = dao.selectOneMember(member.getMemberId());
+			
+			//기존 비밀번호 일치 결과(true or false) 리턴
+			return encoder.matches(member.getMemberPw(), m.getMemberPw()); 
+		}			
+	}
+
+	@Transactional
+	public Object updateMemberPw(String accessToken, Member member) {
+		Object	resObj = jwtUtils.validateToken(accessToken);
+		
+		if(resObj instanceof HttpStatus httpStatus) {
+			return resObj;
+		}else {
+			//토큰 검증 성공
+			String encodePw = encoder.encode(member.getMemberPw());
+			member.setMemberPw(encodePw);;
+			
+			//DB 업데이트
+			return dao.updateMember(member);
+		}
+		
+	}
+
+
+	public Object refreshToken(String refreshToken, Member member) {		
+		//1. refreshToken도 만료되었는지 검증하기 위해 메소드 호출
+		Object resObj = jwtUtils.validateToken(refreshToken);
+		
+		if(resObj instanceof HttpStatus httpStatus) {
+			//refreshToken도 만료가 된 경우
+			return resObj;
+		}else {
+			//refreshToken 검증 통과 => accessToken 재발급 처리
+			String accessToken = jwtUtils.createAccessToken(member.getMemberId(), member.getMemberLevel());
+			return accessToken;
+		}		
+	}	
 	
 }

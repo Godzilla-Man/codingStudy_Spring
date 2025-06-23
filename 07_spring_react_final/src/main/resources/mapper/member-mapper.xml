@@ -39,4 +39,40 @@
  	  from tbl_member
  	 where member_id = #{_parameter} 	  
  	</select>
+ 	
+ 	
+ 	<!--  회원 정보 조회 -->
+ 	<select id="selectOneMember" parameterType="string" resultType="Member">
+ 	select member_id as memberId,
+ 		   member_pw as memberPw,
+ 		   member_name as memberName,
+ 		   member_phone as memberPhone,
+ 		   member_level as memberLevel
+      from tbl_member
+     where member_id = #{_parameter}  	
+ 	</select>
+ 	
+ 	
+ 	<!--  회원 정보 수정 -->
+ 	<update id="updateMember" parameterType="Member">
+ 	update tbl_member
+ 	   set member_name = #{memberName},
+ 	       member_phone = #{memberPhone}
+ 	 where member_id = #{memberId}
+ 	</update>
+ 	
+ 	
+ 	<!-- 회원 탈퇴 -->
+ 	<delete id="deleteMember" parameterType="string">
+ 	delete from tbl_member where member_id= #{_parameter}
+ 	</delete>
+ 	
+ 	
+ 	<!--  비밀번호 변경  -->
+ 	<update id="updateMemberPw" parameterType="Member">
+ 	update tbl_member
+ 	   set member_pw = #{memberPw}
+ 	 where member_id = #{memberId}
+ 	</update> 
+ 	
 </mapper>

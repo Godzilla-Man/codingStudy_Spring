@@ -13,6 +13,11 @@ public interface MemberDao {
 
 	Member memberLogin(String memberId);
 
+	Member selectOneMember(String memberId);
+
+	int updateMember(Member member);
+
+	int deleteMember(String memberId);
 	
 
 }
