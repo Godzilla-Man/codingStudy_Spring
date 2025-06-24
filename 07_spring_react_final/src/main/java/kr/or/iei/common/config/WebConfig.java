@@ -1,9 +1,11 @@
 package kr.or.iei.common.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import jakarta.servlet.Filter;
@@ -29,5 +31,16 @@ public class WebConfig implements WebMvcConfigurer{ //이 클래스는 Spring MV
 	public BCryptPasswordEncoder bcrypt() {
 		return new BCryptPasswordEncoder();
 	}
-
+	
+	@Value("${file.uploadPath}")
+	private String uploadPath;
+	
+	//자원 요청에 대한 접근 권한 부여
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry.addResourceHandler("/editor/**") //클라이언트가 요청한 URL 정보
+				.addResourceLocations("file:///" + uploadPath + "/editor/"); //자원이 위치한 경로
+		registry.addResourceHandler("/board/**")
+				.addResourceLocations("file:///" + uploadPath + "/board/");
+	}
 }

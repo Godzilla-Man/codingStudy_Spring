@@ -1,4 +1,4 @@
-package kr.or.iei.common.dto;
+package kr.or.iei.common.model.dto;
 
 import org.springframework.http.HttpStatus;
 

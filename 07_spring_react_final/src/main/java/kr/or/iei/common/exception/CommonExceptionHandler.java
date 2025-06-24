@@ -4,7 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import kr.or.iei.common.dto.ResponseDTO;
+import kr.or.iei.common.model.dto.ResponseDTO;
 
 //RestController가 작성된 컨트롤러에서 예외 발생 시, 처리할 핸들러 클래스
 @RestControllerAdvice //전역 예외 처리기
