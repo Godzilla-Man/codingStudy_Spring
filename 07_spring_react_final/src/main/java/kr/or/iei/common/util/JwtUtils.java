@@ -37,7 +37,7 @@ public class JwtUtils {
 		
 		Calendar calendar = Calendar.getInstance();					//현재시간
 		Date startTimeDate = calendar.getTime();					//현재시간 == 유효 시작시간
-		calendar.add(Calendar.SECOND, jwtExpireMinute); 			//현재시간 + 10분 == 유효 만료 시간
+		calendar.add(Calendar.MINUTE, jwtExpireMinute); 			//현재시간 + 10분 == 유효 만료 시간
 		
 		Date expireTime = calendar.getTime();						//만료시간
 		

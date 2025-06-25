@@ -40,6 +40,8 @@ insert into tbl_board values (seq_board.nextval, 'Á¦¸ñ'||seq_board.currval, null
 
 commit;
 
-
-
+select * from tbl_member;
+select * from TBL_BOARD;
+select * from TBL_BOARD order by board_no desc;
+select * from tbl_board_file;
 

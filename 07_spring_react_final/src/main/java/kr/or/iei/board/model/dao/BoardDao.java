@@ -20,6 +20,19 @@ public interface BoardDao {
 	int insertBoard(Board board);
 
 	int insertBoardFile(BoardFile file);
+
+	Board selectOneBoard(int boardNo);
+
+	BoardFile selectBoardFile(int boardFileNo);
+
+	int deleteBoard(int boardNo);
+
+	int updateBoard(Board board);
+
+	ArrayList<BoardFile> selectDelBoardFile(int[] delBoardFileNo);
+
+	void deleteBoardFile(int[] delBoardFileNo);
+
 	
 	
 

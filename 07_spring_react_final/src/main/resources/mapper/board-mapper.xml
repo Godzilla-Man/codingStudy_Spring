@@ -62,5 +62,110 @@
 		#{filePath}
 		)
 	</insert>
+	
+	<!-- 게시글 상세 조회
+		resultType => resultMap (조회 결과를 편집하기 위해 사용됨)
+	 -->
+	<select id="selectOneBoard" parameterType="_int" resultMap="boardMap">
+	select board_no,
+		   board_title,
+		   board_thumb,
+		   board_content,
+		   board_writer,
+		   board_status,
+		   board_date
+	  from tbl_board
+	 where board_no = #{_parameter}
+	</select>
+	
+	<select id="selectBoardFileList" parameterType="_int" resultType="BoardFile">
+	select board_file_no as boardFileNo,
+		   board_no as boardNo,
+		   file_name as fileName,
+		   file_path as filePath
+	  from tbl_board_file
+	 where board_no = #{_parameter}	
+	</select>
+	
+	<resultMap type="Board" id="boardMap">
+		<!-- SQL 조회 결과 컬럼을, type 속성에 작성된 DTO 클래스의 어느 변수에 바인딩할 지 -->
+		<result column="board_no" property="boardNo" />
+		<result column="board_title" property="boardTitle" />
+		<result column="board_thumb" property="boardThumbPath" />
+		<result column="board_content" property="boardContent" />
+		<result column="board_writer" property="boardWriter" />
+		<result column="board_status" property="boardStatus" />
+		<result column="board_date" property="boardDate" />
+		
+		<!-- property : 수행 결과를 바인딩할 DTO 클래스 변수명
+			 select : 실행할 SQL ID
+			 column : 실행할 SQL에 필요한 파라미터
+			 javaType : 실행 결과를 담을 Java 객체 타입
+			 ofType : javaType의 제네릭 타입
+		 -->
+		<collection property="fileList" 
+					select="selectBoardFileList" 
+					column="board_no"
+					javaType="java.util.List"
+					ofType="BoardFile"
+					>
+		
+		</collection>
+	</resultMap>
+	
+	<!-- 파일 1개 정보 조회 -->
+	<select id="selectBoardFile" parameterType="_int" resultType="BoardFile">
+	select board_file_no as boardFileNo,
+	       board_no as boardNo,
+	       file_name as fileName,
+	       file_path as filePath
+	  from tbl_board_file
+	 where board_file_no = #{_parameter} 
+	</select>
+	
+	<!-- 게시글 정보 삭제
+		 게시글 파일은 cascade 옵셥으로 자동 삭제
+	 -->
+	<delete id="deleteBoard" parameterType="_int">
+	delete from tbl_board where board_no = #{_parameter}
+	</delete>
+	
+	<!-- 게시글 정보 수정
+		 게시글 등록 시, 썸네일 이미지를 업로드하고 등록한 경우
+		 이후에 썸네일을 변경하지 않았다면 파라미터로 전달되는 Board 객체의 boardThumbPath 변수에는
+		 참조자료형 빈 값을 의미하는 null이 들어가 있을 것. 이 때 아래의 조건식을 작성하지 않으면
+		 썸네일 정보가 null로 업데이트 되어 버린다.
+	 -->
+	<update id="updateBoard" parameterType="Board">
+	update tbl_board
+	   set board_title = #{boardTitle},
+	       board_content = #{boardContent}
+	       <if test="boardThumbPath != null and boardThumbPath != ''">
+	       ,board_thumb = #{boardThumbPath}
+	       </if>
+	 where board_no = #{boardNo}
+	</update>
+	
+	<!-- 삭제 대상 파일 리스트 조회 -->
+	<select id="selectDelBoardFile" parameterType="map" resultType="BoardFile">
+	select board_file_no as boardFileNo,
+	       board_no as boardNo,
+	       file_name as fileName,
+	       file_path as filePath
+	  from tbl_board_file
+	 where board_file_no in
+	 <foreach collection="array" item="boardFileNo" open="(" separator="," close=")">
+	 	#{boardFileNo}	 	
+	 </foreach> 	      
+	</select>
+	
+	<!-- 삭제 대상 파일 DB 삭제 -->
+	<delete id="deleteBoardFile" parameterType="map">
+	delete from tbl_board_file
+	 where board_file_no in
+	 <foreach collection="array" item="boardFileNo" open="(" separator="," close=")">
+	 	#{boardFileNo}	 	
+	 </foreach>
+	</delete>
 
 </mapper>
