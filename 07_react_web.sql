@@ -37,6 +37,9 @@ CREATE SEQUENCE SEQ_BOARD_FILE;
 
 
 insert into tbl_board values (seq_board.nextval, '力格'||seq_board.currval, null, '郴侩'||seq_board.currval, 'aaaaaaaa', 2, sysdate);
+INSERT INTO tbl_member VALUES ('admin', 1234, '包府磊', '010-1111-4111', 1);
+update tbl_member set member_Level = 1 where member_id='aaaaaaaa';
+delete from tbl_member where member_id='admin';
 
 commit;
 
